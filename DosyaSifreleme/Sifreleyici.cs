@@ -100,5 +100,13 @@ namespace DosyaSifreleme
                 textDosya.Text = DosyaSec.FileName;
             }
         }
+
+        private void Sifreleyici_Load(object sender, EventArgs e)
+        {
+            textDosya.TabStop = false;
+            buttonDosyaSec.TabStop = false;
+            buttonSifreCoz.TabStop = false;
+            buttonSifrele.TabStop = false;
+        }
     }
 }

@@ -110,6 +110,7 @@
             this.Name = "Sifreleyici";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Dosya Şifreleyici";
+            this.Load += new System.EventHandler(this.Sifreleyici_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
