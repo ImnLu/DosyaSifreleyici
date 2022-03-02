@@ -20,7 +20,7 @@ namespace DosyaSifreleme
 
         private void buttonSifre_Click(object sender, EventArgs e)
         {
-            // Dosya seçilip seçilmediğini kontrol ediyor.
+            // Dosyanın seçilip seçilmediğini kontrol ediyor.
             if (!string.IsNullOrEmpty(textDosya.Text))
             {
                 // Dosyanın olup olmadığını kontrol ediyor.
@@ -28,7 +28,7 @@ namespace DosyaSifreleme
                 {
                     string kontrol = textDosya.Text.Substring(textDosya.Text.Length - 8, 8);
 
-                    // Dosya şifrelenip şifrelenmediğini kontrol ediyor.
+                    // Dosyanın şifrelenip şifrelenmediğini kontrol ediyor.
                     if (kontrol == "mencrypt")
                         MessageBox.Show("Bu dosya zaten şifrelenmiş!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     else
@@ -94,7 +94,7 @@ namespace DosyaSifreleme
 
         private void buttonDosyaSec_Click(object sender, EventArgs e)
         {
-            //Dosya seçince dosya konumunu textbox'a yazdırıyor.
+            //Dosyyıa seçince dosyanın konumunu textbox'a yazdırıyor.
             if (DosyaSec.ShowDialog() == DialogResult.OK)
             {
                 textDosya.Text = DosyaSec.FileName;
