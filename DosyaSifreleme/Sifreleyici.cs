@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace DosyaSifreleme
 {
@@ -16,6 +11,37 @@ namespace DosyaSifreleme
         public Sifreleyici()
         {
             InitializeComponent();
+        }
+
+        private void DecryptFile(string inputFile, string outputFile)
+        {
+            try
+            {
+                string password = @"MaliMali";
+
+                UnicodeEncoding UE = new UnicodeEncoding();
+                byte[] key = UE.GetBytes(password);
+
+                FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
+
+                RijndaelManaged RMCrypto = new RijndaelManaged();
+
+                CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
+
+                FileStream fsOut = new FileStream(outputFile, FileMode.Create);
+
+                int data;
+                while ((data = cs.ReadByte()) != -1)
+                    fsOut.WriteByte((byte)data);
+
+                fsOut.Close();
+                cs.Close();
+                fsCrypt.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Şifre çözme başarısız!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void buttonSifre_Click(object sender, EventArgs e)
@@ -33,19 +59,37 @@ namespace DosyaSifreleme
                         MessageBox.Show("Bu dosya zaten şifrelenmiş!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     else
                     {
-                        // Dosyayı okuyup her karakteri bir sonraki karaktere dönüştürüyor.
-                        Byte[] dosya = File.ReadAllBytes(textDosya.Text);
-                        for (int i = 0; i < dosya.Length; i++)
+                        // Şifreleme işlemini başlatıyor.
+                        try
                         {
-                            dosya[i] = (Byte)((int)dosya[i] + 1);
-                            if (dosya[i] > 255)
-                            {
-                                dosya[i] = 0;
-                            }
+                            string password = @"MaliMali"; // Şifrelidiği parola.
+                            UnicodeEncoding UE = new UnicodeEncoding();
+                            byte[] key = UE.GetBytes(password);
+
+                            string cryptFile = textDosya.Text + "mencrypt";
+                            FileStream fsCrypt = new FileStream(cryptFile, FileMode.Create);
+
+                            RijndaelManaged RMCrypto = new RijndaelManaged();
+
+                            CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
+
+                            FileStream fsIn = new FileStream(textDosya.Text, FileMode.Open);
+
+                            int data;
+                            while ((data = fsIn.ReadByte()) != -1)
+                                cs.WriteByte((byte)data);
+
+                            fsIn.Close();
+                            cs.Close();
+                            fsCrypt.Close();
+
+                            textDosya.Text = "";
+                            MessageBox.Show("Dosya başarıyla şifrelendi!", "Mesaj", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-                        File.WriteAllBytes(textDosya.Text + "mencrypt", dosya);
-                        textDosya.Text = "";
-                        MessageBox.Show("Dosya başarıyla şifrelendi!", "Mesaj", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        catch
+                        {
+                            MessageBox.Show("Şifreleme başarısız!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
                 else
@@ -67,19 +111,37 @@ namespace DosyaSifreleme
                     // Dosyanın şifrelenip şifrelenmediğini kontrol ediyor.
                     if (kontrol == "mencrypt")
                     {
-                        // Dosyayı okuyup her karakteri bir önceki karaktere dönüştürüyor.
-                        Byte[] dosya = File.ReadAllBytes(textDosya.Text);
-                        for (int i = 0; i < dosya.Length; i++)
+                        // Şifre çözme işlemini başlatıyor.
+                        try
                         {
-                            if (dosya[i] < 0)
-                            {
-                                dosya[i] = 255;
-                            }
-                            dosya[i] = (Byte)((int)dosya[i] - 1);
+                            string password = @"MaliMali"; // Şifreyi çözerken deneyeceği parola.
+
+                            UnicodeEncoding UE = new UnicodeEncoding();
+                            byte[] key = UE.GetBytes(password);
+
+                            FileStream fsCrypt = new FileStream(textDosya.Text, FileMode.Open);
+
+                            RijndaelManaged RMCrypto = new RijndaelManaged();
+
+                            CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
+
+                            FileStream fsOut = new FileStream(textDosya.Text.Substring(0, textDosya.Text.Length - 8), FileMode.Create);
+
+                            int data;
+                            while ((data = cs.ReadByte()) != -1)
+                                fsOut.WriteByte((byte)data);
+
+                            fsOut.Close();
+                            cs.Close();
+                            fsCrypt.Close();
+
+                            textDosya.Text = "";
+                            MessageBox.Show("Dosyanın şifresi başarıyla çözüldü!", "Mesaj", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-                        File.WriteAllBytes(textDosya.Text.Substring(0, textDosya.Text.Length - 8), dosya);
-                        textDosya.Text = "";
-                        MessageBox.Show("Dosyanın şifresi başarıyla çözüldü!", "Mesaj", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        catch
+                        {
+                            MessageBox.Show("Şifre çözme başarısız!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                     else
                         MessageBox.Show("Bu dosya şifrelenmiş bir dosya değil!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
