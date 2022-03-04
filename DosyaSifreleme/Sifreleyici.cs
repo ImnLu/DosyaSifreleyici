@@ -13,37 +13,6 @@ namespace DosyaSifreleme
             InitializeComponent();
         }
 
-        private void DecryptFile(string inputFile, string outputFile)
-        {
-            try
-            {
-                string password = @"MaliMali";
-
-                UnicodeEncoding UE = new UnicodeEncoding();
-                byte[] key = UE.GetBytes(password);
-
-                FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
-
-                RijndaelManaged RMCrypto = new RijndaelManaged();
-
-                CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
-
-                FileStream fsOut = new FileStream(outputFile, FileMode.Create);
-
-                int data;
-                while ((data = cs.ReadByte()) != -1)
-                    fsOut.WriteByte((byte)data);
-
-                fsOut.Close();
-                cs.Close();
-                fsCrypt.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Şifre çözme başarısız!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void buttonSifre_Click(object sender, EventArgs e)
         {
             // Dosyanın seçilip seçilmediğini kontrol ediyor.
